@@ -21,47 +21,26 @@ A implementação das Ondas de Gerstner em um ambiente gráfico geralmente é re
 
 #### Vertex Shader
 
-```glsl
-#version 330 core
+```cpp
+glm::vec3 v_position = glm::vec3(x, 0.0f, z);
+      float waveHeight =
+          amplitude *
+              glm::sin(
+                  glm::dot(glm::vec2(u_lightDirection.x, u_lightDirection.y),
+                           glm::vec2(v_position.x, v_position.z))) *
+              (6.283185 / wavelength) -
+          time * speed;
+      glm::vec3 perturbedPosition =
+          v_position + glm::vec3(0.0, waveHeight, 0.0);
 
-in vec3 inPosition;
-out vec4 fragPosition;
+      glm::vec3 finalColor =
+          glm::vec3(0.0, 0.5, 1.0) * (waveHeight / amplitude);
 
-uniform float amplitude;
-uniform float wavelength;
-uniform float phase;
-uniform vec2 direction;
+      glm::mat4 model{1.0f};
+      model = glm::scale(model, glm::vec3(0.01f));
+      model = glm::translate(model,
+                             glm::vec3(perturbedPosition.x, perturbedPosition.y,
+                                       perturbedPosition.z));
 
-void main() {
-    // Gerstner Waves equations
-    float omega = 2.0 * 3.14159 / wavelength;
-    float k = 2.0 * 3.14159 / wavelength;
-    float phi = k * dot(normalize(direction), vec2(inPosition.x, inPosition.z)) - omega * phase;
-
-    vec3 displacement = vec3(
-        amplitude * cos(omega * phase + phi),
-        0.0,
-        amplitude * sin(omega * phase + phi)
-    );
-
-    gl_Position = projection * view * model * vec4(inPosition + displacement, 1.0);
-    fragPosition = model * vec4(inPosition + displacement, 1.0);
-}
-´´´
-#### Fragment Shader
-
-```glsl
-#version 330 core
-
-in vec4 fragPosition;
-out vec4 fragColor;
-
-void main() {
-    // Implement your fragment shader logic here
-    // Example: Set the color based on the height of the wave
-    float waveHeight = fragPosition.y;
-    vec3 color = vec3(0.0, 0.5, 1.0); // Blue color
-    float alpha = 1.0 - smoothstep(0.0, 0.2, abs(waveHeight));
-    fragColor = vec4(color, alpha);
-}
-´´´
+      abcg::glUniformMatrix4fv(m_modelMatrixLoc, 1, GL_FALSE, &model[0][0]);
+```
