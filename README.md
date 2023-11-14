@@ -22,7 +22,13 @@ A implementação das Ondas de Gerstner em um ambiente gráfico geralmente é re
 #### Vertex Shader
 
 ```cpp
-glm::vec3 v_position = glm::vec3(x, 0.0f, z);
+  auto const N{150};
+  for (auto const z : iter::range(-N, N + 1)) {
+    for (auto const x : iter::range(-N, N + 1)) {
+      // Set model matrix as a translation matrix
+
+      glm::vec3 v_position = glm::vec3(static_cast<float>(x) / 12.5, 0.0f,
+                                       static_cast<float>(z) / 12.5);
       float waveHeight =
           amplitude *
               glm::sin(
@@ -34,13 +40,22 @@ glm::vec3 v_position = glm::vec3(x, 0.0f, z);
           v_position + glm::vec3(0.0, waveHeight, 0.0);
 
       glm::vec3 finalColor =
-          glm::vec3(0.0, 0.5, 1.0) * (waveHeight / amplitude);
+          glm::vec3(35.0 / 255.0, 35.0 / 255.0, 142.0 / 255.0) *
+          (waveHeight / amplitude);
 
       glm::mat4 model{1.0f};
-      model = glm::scale(model, glm::vec3(0.01f));
+      model = glm::scale(model, glm::vec3(0.1f));
       model = glm::translate(model,
                              glm::vec3(perturbedPosition.x, perturbedPosition.y,
                                        perturbedPosition.z));
-
       abcg::glUniformMatrix4fv(m_modelMatrixLoc, 1, GL_FALSE, &model[0][0]);
+
+      abcg::glUniform4f(m_colorLoc, finalColor.x, finalColor.y, finalColor.z,
+                        1.0f);
+
+      abcg::glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+  }
+
+  abcg::glBindVertexArray(0);
 ```
