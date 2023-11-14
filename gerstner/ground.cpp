@@ -61,7 +61,7 @@ void Ground::paint() {
               glm::sin(
                   glm::dot(glm::vec2(u_lightDirection.x, u_lightDirection.y),
                            glm::vec2(v_position.x, v_position.z))) *
-              (6.283185 / wavelength) -
+              (6.283185 / wavelength) +
           time * speed;
       glm::vec3 perturbedPosition =
           v_position + glm::vec3(0.0, waveHeight, 0.0);
@@ -75,11 +75,8 @@ void Ground::paint() {
       model = glm::translate(model,
                              glm::vec3(perturbedPosition.x, perturbedPosition.y,
                                        perturbedPosition.z));
-
       abcg::glUniformMatrix4fv(m_modelMatrixLoc, 1, GL_FALSE, &model[0][0]);
 
-      // Set color (checkerboard pattern)
-      // auto const gray{(z + x) % 2 == 0 ? 1.0f : 0.5f};
       abcg::glUniform4f(m_colorLoc, finalColor.x, finalColor.y, finalColor.z,
                         1.0f);
 

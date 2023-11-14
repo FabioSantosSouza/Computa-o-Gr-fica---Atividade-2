@@ -10,7 +10,7 @@ public:
   void destroy();
 
   float time{1.0f};
-  float amplitude{1.1};
+  float amplitude{0.46};
   float wavelength{1.0};
   float speed{1.0};
   int m_delay{50};
